@@ -3,7 +3,7 @@ const User = require("../models/user");
 const getUser = (req, res) => {
   User.findById(req.params._id)
     .then((user) => res.send({ data: user }))
-    .catch((err) => res.status(500).send({ message: err.message }));
+    .catch((err) => res.status(404).send({ message: err.message }));
 };
 
 const getUsers = (req, res) => {
@@ -31,7 +31,7 @@ const updateUser = (req, res) => {
     }
   )
     .then((user) => res.send({ data: user }))
-    .catch((err) => res.status(500).send({ message: err.message }));
+    .catch((err) => res.status(400).send({ message: err.message }));
 };
 
 const updateAvatar = (req, res) => {
@@ -45,7 +45,7 @@ const updateAvatar = (req, res) => {
     }
   )
     .then((user) => res.send({ data: user }))
-    .catch((err) => res.status(500).send({ message: err.message }));
+    .catch((err) => res.status(400).send({ message: err.message }));
 };
 
 module.exports = { createUser, getUser, getUsers, updateUser, updateAvatar };
