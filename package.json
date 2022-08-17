@@ -1,5 +1,6 @@
 {
   "name": "backend",
+  "homepage": "https://sergo0808.github.io/express-mesto-gha",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
