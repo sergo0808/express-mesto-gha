@@ -6,10 +6,18 @@ const SERVER_ERROR_CODE = 500;
 
 const getUser = (req, res) => {
   User.findById(req.params._id)
+    .orFail(() => {
+      throw new Error("Пользователь не найден");
+    })
     .then((user) => res.send({ data: user }))
     .catch((err) => {
       if (err.name === "CastError") {
         res.status(BAD_REQUEST_CODE).send({ message: err.message });
+        return;
+      }
+      if (err.name === "Error") {
+        res.status(NOT_FOUND_CODE).send({ message: err.message });
+        return;
       }
     });
 };

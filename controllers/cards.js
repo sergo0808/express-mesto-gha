@@ -1,4 +1,7 @@
 const Card = require("../models/card");
+const BAD_REQUEST_CODE = 400;
+const NOT_FOUND_CODE = 404;
+const SERVER_ERROR_CODE = 500;
 
 const getCards = (req, res) => {
   Card.find({})
@@ -9,8 +12,10 @@ const getCards = (req, res) => {
 const createCard = (req, res) => {
   const { title, link } = req.body;
   Card.create({ title, link, owner: req.user._id })
-    .then((card) => res.send({ data: card }))
-    .catch((err) => res.status(400).send({ message: err.message }));
+    .then((card) => res.status(200).send({ data: card }))
+    .catch((err) =>
+      res.status(BAD_REQUEST_CODE).send({ message: err.message })
+    );
 };
 
 const deleteCard = (req, res) => {
@@ -28,7 +33,9 @@ const likeCard = (req, res) => {
     { new: true }
   )
     .then((card) => res.send({ data: card }))
-    .catch((err) => res.status(500).send({ message: err.message }));
+    .catch((err) =>
+      res.status(SERVER_ERROR_CODE).send({ message: err.message })
+    );
 };
 
 const dislikeCard = (req, res) => {
@@ -38,7 +45,9 @@ const dislikeCard = (req, res) => {
     { new: true }
   )
     .then((card) => res.send({ data: card }))
-    .catch((err) => res.status(500).send({ message: err.message }));
+    .catch((err) =>
+      res.status(SERVER_ERROR_CODE).send({ message: err.message })
+    );
 };
 
 module.exports = { createCard, deleteCard, getCards, likeCard, dislikeCard };
