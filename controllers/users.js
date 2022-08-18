@@ -16,7 +16,10 @@ const createUser = (req, res) => {
   const { name, about, avatar } = req.body;
 
   User.create({ name, about, avatar })
-    .then((user) => res.send({ data: user }))
+    .then((user) => res.send({ data: user }), {
+      new: true, // обработчик then получит на вход обновлённую запись
+      runValidators: true, // данные будут валидированы перед изменением
+    })
     .catch((err) => res.status(400).send({ message: err.message }));
 };
 
