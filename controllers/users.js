@@ -1,5 +1,9 @@
 const User = require("../models/user");
 
+const BAD_REQUEST_CODE = 400;
+const NOT_FOUND_CODE = 404;
+const SERVER_ERROR_CODE = 500;
+
 const getUser = (req, res) => {
   User.findById(req.params._id)
     .then((user) => res.send({ data: user }))
@@ -9,7 +13,9 @@ const getUser = (req, res) => {
 const getUsers = (req, res) => {
   User.find({})
     .then((user) => res.send({ data: user }))
-    .catch((err) => res.status(500).send({ message: err.message }));
+    .catch((err) => {
+      res.status(500).send({ message: err.message });
+    });
 };
 
 const createUser = (req, res) => {
@@ -17,7 +23,6 @@ const createUser = (req, res) => {
 
   User.create({ name, about, avatar })
     .then((user) => res.send({ data: user }), {
-      new: true, // обработчик then получит на вход обновлённую запись
       runValidators: true, // данные будут валидированы перед изменением
     })
     .catch((err) => res.status(400).send({ message: err.message }));
