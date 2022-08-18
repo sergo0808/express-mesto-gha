@@ -7,14 +7,14 @@ const SERVER_ERROR_CODE = 500;
 const getUser = (req, res) => {
   User.findById(req.params._id)
     .then((user) => res.send({ data: user }))
-    .catch((err) => res.status(404).send({ message: err.message }));
+    .catch((err) => res.status(NOT_FOUND_CODE).send({ message: err.message }));
 };
 
 const getUsers = (req, res) => {
   User.find({})
     .then((user) => res.send({ data: user }))
     .catch((err) => {
-      res.status(500).send({ message: err.message });
+      res.status(SERVER_ERROR_CODE).send({ message: err.message });
     });
 };
 
@@ -22,10 +22,10 @@ const createUser = (req, res) => {
   const { name, about, avatar } = req.body;
 
   User.create({ name, about, avatar })
-    .then((user) => res.send({ data: user }), {
-      runValidators: true, // данные будут валидированы перед изменением
-    })
-    .catch((err) => res.status(400).send({ message: err.message }));
+    .then((user) => res.send({ data: user }))
+    .catch((err) =>
+      res.status(BAD_REQUEST_CODE).send({ message: err.message })
+    );
 };
 
 const updateUser = (req, res) => {
@@ -39,7 +39,9 @@ const updateUser = (req, res) => {
     }
   )
     .then((user) => res.send({ data: user }))
-    .catch((err) => res.status(400).send({ message: err.message }));
+    .catch((err) =>
+      res.status(BAD_REQUEST_CODE).send({ message: err.message })
+    );
 };
 
 const updateAvatar = (req, res) => {
@@ -53,7 +55,9 @@ const updateAvatar = (req, res) => {
     }
   )
     .then((user) => res.send({ data: user }))
-    .catch((err) => res.status(400).send({ message: err.message }));
+    .catch((err) =>
+      res.status(BAD_REQUEST_CODE).send({ message: err.message })
+    );
 };
 
 module.exports = { createUser, getUser, getUsers, updateUser, updateAvatar };
