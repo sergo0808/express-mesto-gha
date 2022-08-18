@@ -14,7 +14,7 @@ const getUsers = (req, res) => {
   User.find({})
     .then((user) => res.send({ data: user }))
     .catch((err) => {
-      res.status(SERVER_ERROR_CODE).send({ message: err.message });
+      res.status(BAD_REQUEST_CODE).send(err.name);
     });
 };
 
@@ -24,7 +24,7 @@ const createUser = (req, res) => {
   User.create({ name, about, avatar })
     .then((user) => res.send({ data: user }))
     .catch((err) => {
-      res.status(BAD_REQUEST_CODE).send({ message: err.message });
+      res.status(BAD_REQUEST_CODE).send({ message: err.name });
     });
 };
 
