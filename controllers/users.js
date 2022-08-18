@@ -13,7 +13,13 @@ const getUser = (req, res) => {
 const getUsers = (req, res) => {
   User.find({})
     .then((user) => res.send({ data: user }))
-    .catch((err) => res.status(SERVER_ERROR_CODE).send(err.message));
+    .catch((err) => {
+      if (err.name === "CastError") {
+        (err) => res.status(BAD_REQUEST_CODE).send(err.message);
+        return;
+      }
+      res.status(SERVER_ERROR_CODE).send(err.message);
+    });
 };
 
 const createUser = (req, res) => {
@@ -22,7 +28,7 @@ const createUser = (req, res) => {
   User.create({ name, about, avatar })
     .then((user) => res.send({ data: user }))
     .catch((err) => {
-      res.status(BAD_REQUEST_CODE).send({ message: err.name });
+      res.status(BAD_REQUEST_CODE).send({ message: err.message });
     });
 };
 
