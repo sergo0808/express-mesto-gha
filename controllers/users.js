@@ -7,18 +7,18 @@ const SERVER_ERROR_CODE = 500;
 const getUser = (req, res) => {
   User.findById(req.params._id)
     .then((user) => res.send({ data: user }))
-    .catch((err) => res.status(NOT_FOUND_CODE).send({ message: err.message }));
+    .catch((err) => {
+      if (err.name === "CastError") {
+        res.status(BAD_REQUEST_CODE).send({ message: err.message });
+      }
+    });
 };
 
 const getUsers = (req, res) => {
   User.find({})
     .then((user) => res.send({ data: user }))
     .catch((err) => {
-      if (err.name === "CastError") {
-        (err) => res.status(BAD_REQUEST_CODE).send(err.message);
-        return;
-      }
-      res.status(SERVER_ERROR_CODE).send(err.message);
+      res.status(SERVER_ERROR_CODE).send({ message: err.message });
     });
 };
 
