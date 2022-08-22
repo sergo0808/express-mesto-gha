@@ -13,7 +13,7 @@ const getCards = (req, res) => {
     });
 };
 const createCard = (req, res) => {
-  const { title, link } = req.body;
+  const { name, link } = req.body;
   Card.create({ title, link, owner: req.user._id })
     .then((card) => {
       res.status(201).send(card);
