@@ -12,7 +12,7 @@ const getCards = (req, res) => {
 const createCard = (req, res) => {
   const { title, link } = req.body;
   Card.create({ title, link, owner: req.user._id })
-    .then((card) => res.status(200).send(card))
+    .then((card) => res.status(201).send(card))
     .catch((err) =>
       res.status(BAD_REQUEST_CODE).send({ message: err.message })
     );
