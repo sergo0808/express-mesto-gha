@@ -7,7 +7,7 @@ const SERVER_ERROR_CODE = 500;
 const getUser = (req, res) => {
   User.findById(req.params._id)
     .orFail(() => {
-      throw new NotFoundError("Пользователь не найден");
+      throw new Error("Пользователь не найден");
     })
     .then((user) => res.send({ data: user }))
     .catch((err) => {
