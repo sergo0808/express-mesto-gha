@@ -3,6 +3,8 @@ const BAD_REQUEST_CODE = 400;
 const NOT_FOUND_CODE = 404;
 const SERVER_ERROR_CODE = 500;
 
+const NotFoundError = require("../NotFoundErrors");
+
 const getCards = (req, res) => {
   Card.find({})
     .then((cards) => res.status(200).send(cards))
@@ -63,7 +65,7 @@ const likeCard = (req, res) => {
     { new: true }
   )
     .orFail(() => {
-      throw new Error(`Карточка с id: ${cardId} не найдена`);
+      throw new NotFoundError(`Карточка с id: ${cardId} не найдена`);
     })
     .then((card) => {
       res.status(201).send(card);
@@ -92,7 +94,7 @@ const dislikeCard = (req, res) => {
     { new: true }
   )
     .orFail(() => {
-      throw new Error(`Карточка с id: ${cardId} не найдена`);
+      throw new NotFoundError(`Карточка с id: ${cardId} не найдена`);
     })
     .then((card) => {
       res.status(200).send(card);
