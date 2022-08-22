@@ -10,15 +10,20 @@ const getCards = (req, res) => {
 };
 
 const createCard = (req, res) => {
-  const { title, link } = req.body;
-  const owner = req.user._id;
-  Card.create({ title, link, owner })
-    .then((card) => res.status(201).send(card))
+  const { name, link } = req.body;
+  Card.create({ name, link, owner: req.user._id })
+    .then((card) => {
+      res.status(200).send(card);
+    })
     .catch((err) => {
       if (err.name === "ValidationError") {
-        res.status(BAD_REQUEST_CODE).send({ message: err.message });
+        res.status(BAD_REQUEST_CODE).send({
+          message: `Переданы некорректные данные в методы создания карточки, ${err.message}`,
+        });
       } else {
-        res.status(SERVER_ERROR_COD).send({ message: err.message });
+        res
+          .status(SERVER_ERROR_CODE)
+          .send({ message: `Ошибка сервера, ${err.message}` });
       }
     });
 };
