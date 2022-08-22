@@ -24,7 +24,7 @@ const createCard = (req, res) => {
 
 const deleteCard = (req, res) => {
   Card.findByIdAndRemove(req.params.cardId).then((card) =>
-    res.send({ data: card })
+    res.status(200).send(card)
   );
 };
 
@@ -36,10 +36,16 @@ const likeCard = (req, res) => {
     { $addToSet: { likes: req.user._id } },
     { new: true }
   )
-    .then((card) => res.send({ data: card }))
-    .catch((err) =>
-      res.status(SERVER_ERROR_CODE).send({ message: err.message })
-    );
+    .then((card) => res.status(201).send(card))
+    .catch((err) => {
+      if (err.name === "CastError") {
+        res.status(BAD_REQUEST_CODE).send({ message: err.name });
+        return;
+      } else {
+        res.status(NOT_FOUND_CODE).send({ message: err.name });
+        return;
+      }
+    });
 };
 
 const dislikeCard = (req, res) => {
