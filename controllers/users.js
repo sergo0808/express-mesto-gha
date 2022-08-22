@@ -1,5 +1,5 @@
 const User = require("../models/user");
-const NotFoundError = require("../errors/NotFoundError");
+const NotFoundError = require("../NotFoundErrors");
 const BAD_REQUEST_CODE = 400;
 const NOT_FOUND_CODE = 404;
 const SERVER_ERROR_CODE = 500;
