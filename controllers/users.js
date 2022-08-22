@@ -8,6 +8,7 @@ const getUser = (req, res) => {
   User.findById(req.params._id)
     .orFail(() => {
       throw new Error("Пользователь не найден");
+      console.log(Error);
     })
     .then((user) => res.send({ data: user }))
     .catch((err) => {
