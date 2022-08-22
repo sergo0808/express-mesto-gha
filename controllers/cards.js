@@ -36,7 +36,7 @@ const deleteCard = (req, res) => {
   const { cardId } = req.params;
   Card.findByIdAndRemove(cardId)
     .orFail(() => {
-      throw new Error(`Карточка с id: ${cardId} не найдена`);
+      throw new NotFoundError(`Карточка с id: ${cardId} не найдена`);
     })
     .then((card) => {
       res.status(200).send(card);
