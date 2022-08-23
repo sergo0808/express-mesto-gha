@@ -1,5 +1,6 @@
-const User = require("../models/user");
-const NotFoundError = require("../NotFoundErrors");
+const User = require('../models/user');
+const NotFoundError = require('../NotFoundErrors');
+
 const BAD_REQUEST_CODE = 400;
 const NOT_FOUND_CODE = 404;
 const SERVER_ERROR_CODE = 500;
@@ -7,20 +8,22 @@ const SERVER_ERROR_CODE = 500;
 const getUser = (req, res) => {
   User.findById(req.params._id)
     .orFail(() => {
-      throw new Error("Пользователь не найден");
-      console.log(Error);
+      throw new NotFoundError('Пользователь не найден');
     })
     .then((user) => res.send({ data: user }))
     .catch((err) => {
-      if (err.name === "CastError") {
+      if (err.name === 'CastError') {
         res.status(BAD_REQUEST_CODE).send({
           message: `Передан некорректный id пользователя, ${err.message}`,
         });
         return;
       }
-      if (err.name === "Error") {
+      if (err.name === 'NotFoundError') {
         res.status(NOT_FOUND_CODE).send({ message: err.message });
-        return;
+      } else {
+        res
+          .status(SERVER_ERROR_CODE)
+          .send({ message: `Ошибка сервера, ${err.message}` });
       }
     });
 };
@@ -41,13 +44,13 @@ const createUser = (req, res) => {
   User.create({ name, about, avatar })
     .then((user) => res.send({ data: user }))
     .catch((err) => {
-      if (err.name === "ValidationError") {
+      if (err.name === 'ValidationError') {
         res.status(BAD_REQUEST_CODE).send({
           message: `Переданы некорректные данные в методы создания пользователя, ${err.message}`,
         });
       } else {
         res
-          .status(SERVER_ERROR_COD)
+          .status(SERVER_ERROR_CODE)
           .send({ message: `Ошибка сервера, ${err.message}` });
       }
     });
@@ -61,18 +64,18 @@ const updateUser = (req, res) => {
     {
       new: true, // обработчик then получит на вход обновлённую запись
       runValidators: true, // данные будут валидированы перед изменением
-    }
+    },
   )
     .orFail(() => {
       throw new NotFoundError(`пользователь c id: ${req.user._id} не найден`);
     })
     .then((user) => res.send({ data: user }))
     .catch((err) => {
-      if (err.name === "ValidationError") {
+      if (err.name === 'ValidationError') {
         res.status(BAD_REQUEST_CODE).send({
           message: `Переданы некорректные данные в методы обновления профиля, ${err.message}`,
         });
-      } else if (err.name === "NotFoundError") {
+      } else if (err.name === 'NotFoundError') {
         res.status(NOT_FOUND_CODE).send({ message: `${err.message}` });
       } else {
         res
@@ -90,18 +93,18 @@ const updateAvatar = (req, res) => {
     {
       new: true, // обработчик then получит на вход обновлённую запись
       runValidators: true, // данные будут валидированы перед изменением
-    }
+    },
   )
     .orFail(() => {
       throw new NotFoundError(`Пользователь с id: ${req.user._id} не найден`);
     })
     .then((user) => res.send({ data: user }))
     .catch((err) => {
-      if (err.name === "ValidationError") {
+      if (err.name === 'ValidationError') {
         res.status(BAD_REQUEST_CODE).send({
           message: `Переданы некорректные данные в методы обновления аватара пользователя ${err.message}`,
         });
-      } else if (err.name === "NotFoundError") {
+      } else if (err.name === 'NotFoundError') {
         res.status(NOT_FOUND_CODE).send({ message: `${err.message}` });
       } else {
         res
@@ -111,4 +114,6 @@ const updateAvatar = (req, res) => {
     });
 };
 
-module.exports = { createUser, getUser, getUsers, updateUser, updateAvatar };
+module.exports = {
+  createUser, getUser, getUsers, updateUser, updateAvatar,
+};

@@ -1,9 +1,10 @@
-const Card = require("../models/card");
+const Card = require('../models/card');
+
 const BAD_REQUEST_CODE = 400;
 const NOT_FOUND_CODE = 404;
 const SERVER_ERROR_CODE = 500;
 
-const NotFoundError = require("../NotFoundErrors");
+const NotFoundError = require('../NotFoundErrors');
 
 const getCards = (req, res) => {
   Card.find({})
@@ -21,7 +22,7 @@ const createCard = (req, res) => {
       res.status(201).send(card);
     })
     .catch((err) => {
-      if (err.name === "ValidationError") {
+      if (err.name === 'ValidationError') {
         res.status(BAD_REQUEST_CODE).send({
           message: `Переданы некорректные данные в методы создания карточки, ${err.message}`,
         });
@@ -42,11 +43,11 @@ const deleteCard = (req, res) => {
       res.status(200).send(card);
     })
     .catch((err) => {
-      if (err.name === "CastError") {
+      if (err.name === 'CastError') {
         res.status(BAD_REQUEST_CODE).send({
           message: `Передан некорректны id: ${cardId} в методы удаления карточки ${err.message}`,
         });
-      } else if (err.name === "NotFoundError") {
+      } else if (err.name === 'NotFoundError') {
         res.status(NOT_FOUND_CODE).send({
           message: `${err.message}`,
         });
@@ -62,7 +63,7 @@ const likeCard = (req, res) => {
   Card.findByIdAndUpdate(
     cardId,
     { $addToSet: { likes: req.user._id } },
-    { new: true }
+    { new: true },
   )
     .orFail(() => {
       throw new NotFoundError(`Карточка с id: ${cardId} не найдена`);
@@ -71,11 +72,11 @@ const likeCard = (req, res) => {
       res.status(201).send(card);
     })
     .catch((err) => {
-      if (err.name === "CastError") {
+      if (err.name === 'CastError') {
         res.status(BAD_REQUEST_CODE).send({
           message: `Передан некорректный id: ${cardId} в методы постановки лайка карточки, ${err.message}`,
         });
-      } else if (err.name === "NotFoundError") {
+      } else if (err.name === 'NotFoundError') {
         res.status(NOT_FOUND_CODE).send({
           message: `${err.message}`,
         });
@@ -91,7 +92,7 @@ const dislikeCard = (req, res) => {
   Card.findByIdAndUpdate(
     cardId,
     { $pull: { likes: req.user._id } },
-    { new: true }
+    { new: true },
   )
     .orFail(() => {
       throw new NotFoundError(`Карточка с id: ${cardId} не найдена`);
@@ -100,11 +101,11 @@ const dislikeCard = (req, res) => {
       res.status(200).send(card);
     })
     .catch((err) => {
-      if (err.name === "CastError") {
+      if (err.name === 'CastError') {
         res.status(BAD_REQUEST_CODE).send({
           message: `Передан некорректны id: ${cardId} в методы удаления лайка с карточки ${err.message}`,
         });
-      } else if (err.name === "NotFoundError") {
+      } else if (err.name === 'NotFoundError') {
         res.status(NOT_FOUND_CODE).send({
           message: `${err.message}`,
         });
@@ -116,4 +117,6 @@ const dislikeCard = (req, res) => {
     });
 };
 
-module.exports = { createCard, deleteCard, getCards, likeCard, dislikeCard };
+module.exports = {
+  createCard, deleteCard, getCards, likeCard, dislikeCard,
+};
