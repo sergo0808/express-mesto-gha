@@ -1,3 +1,5 @@
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 const NotFoundError = require('../NotFoundErrors');
 
@@ -5,17 +7,26 @@ const BAD_REQUEST_CODE = 400;
 const NOT_FOUND_CODE = 404;
 const SERVER_ERROR_CODE = 500;
 
-const getUser = (req, res) => {
-  User.findById(req.params._id)
+const login = (req, res, next) => {
+  const { email, password } = req.body;
+
+  return User.findUserByCredentials(email, password)
+    .then((user) => {
+      const token = jwt.sign({ _id: user._id }, 'some-secret-key', { expiresIn: '7d' });
+      res.send({ token });
+    })
+    .catch(next);
+};
+
+const getUser = (req, res, next) => {
+  User.findById(req.user._id)
     .orFail(() => {
       throw new NotFoundError('Пользователь не найден');
     })
     .then((user) => res.send({ data: user }))
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(BAD_REQUEST_CODE).send({
-          message: `Передан некорректный id пользователя, ${err.message}`,
-        });
+        next(new NotFoundError(`Передан некорректный id пользователя, ${err.message}`));
         return;
       }
       if (err.name === 'NotFoundError') {
@@ -39,9 +50,16 @@ const getUsers = (req, res) => {
 };
 
 const createUser = (req, res) => {
-  const { name, about, avatar } = req.body;
+  bcrypt.hash(req.body.password, 10)
+    .then((hash) => User.create({
+      name: req.body.name,
+      about: req.body.about,
+      avatar: req.body.avatar,
+      email: req.body.email,
+      password: hash,
 
-  User.create({ name, about, avatar })
+    }))
+
     .then((user) => res.send({ data: user }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
@@ -115,5 +133,5 @@ const updateAvatar = (req, res) => {
 };
 
 module.exports = {
-  createUser, getUser, getUsers, updateUser, updateAvatar,
+  createUser, getUser, getUsers, updateUser, updateAvatar, login,
 };

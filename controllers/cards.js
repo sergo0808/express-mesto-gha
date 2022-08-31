@@ -35,12 +35,17 @@ const createCard = (req, res) => {
 };
 const deleteCard = (req, res) => {
   const { cardId } = req.params;
-  Card.findByIdAndRemove(cardId)
+  Card.findById(cardId)
     .orFail(() => {
       throw new NotFoundError(`Карточка с id: ${cardId} не найдена`);
     })
     .then((card) => {
-      res.status(200).send(card);
+      if (card.owner.equals(req.user._id)) {
+        card.remove();
+        res.status(200).send(card);
+      } else {
+        res.status(500).send({ message: 'Ошибка прав доступа' });
+      }
     })
     .catch((err) => {
       if (err.name === 'CastError') {
