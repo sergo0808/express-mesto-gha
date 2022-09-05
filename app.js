@@ -20,13 +20,13 @@ app.use(express.urlencoded({ extended: true }));
 
 app.post('/signin', login);
 app.post('/signup', createUser);
+app.use(errors());
+app.use(error);
 
 app.use(auth);
 app.use(userRouter);
 app.use(cardRouter);
 app.get('/users/me', getUser);
-app.use(errors());
-app.use(error);
 
 app.use('*', (_, res) => {
   res.status(NOT_FOUND_CODE).send({ message: 'Страница не найдена' });
