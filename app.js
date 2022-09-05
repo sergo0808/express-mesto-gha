@@ -1,48 +1,28 @@
 const express = require('express');
 const mongoose = require('mongoose');
+const cookieParser = require('cookie-parser');
+const helmet = require('helmet');
 const { errors } = require('celebrate');
-const userRouter = require('./routes/users');
-const cardRouter = require('./routes/cards');
-const { createUser, login, getUser } = require('./controllers/users');
-const { authValidate, registerValidate } = require('./middlewares/validation');
-const auth = require('./middlewares/auth');
-const error = require('./middlewares/error');
 
-const NOT_FOUND_CODE = 404;
-const SERVER_ERROR_CODE = 500;
+const routes = require('./routes');
+const error = require('./middlewares/error');
 
 const { PORT = 3000 } = process.env;
 const app = express();
 
-mongoose.connect('mongodb://localhost:27017/mestodb');
-
+app.use(helmet());
+app.use(cookieParser());
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
 
-app.post('/signin', authValidate, login);
-app.post('/signup', registerValidate, createUser);
+mongoose.connect('mongodb://localhost:27017/mestodb', {
+  useUnifiedTopology: true,
+});
+
+app.use(routes); // all routes logic
 app.use(errors());
-app.use(error);
-
-app.use(auth);
-app.use(userRouter);
-app.use(cardRouter);
-app.get('/users/me', getUser);
-
-app.use('*', (_, res) => {
-  res.status(NOT_FOUND_CODE).send({ message: 'Страница не найдена' });
-});
-
-app.use((err, req, res, next) => {
-  if (err.statusCode) {
-    res.status(err.statusCode).send({ message: err.message });
-  } else {
-    res.status(SERVER_ERROR_CODE).send({ message: err.message });
-  }
-
-  next();
-});
+app.use(error); // centralized error handler
 
 app.listen(PORT, () => {
-  console.log(`App listening on port ${PORT}`);
+  // eslint-disable-next-line no-console
+  console.log(`Server started on port ${PORT}`);
 });
