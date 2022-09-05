@@ -4,6 +4,7 @@ const { errors } = require('celebrate');
 const userRouter = require('./routes/users');
 const cardRouter = require('./routes/cards');
 const { createUser, login, getUser } = require('./controllers/users');
+const { authValidate, registerValidate } = require('./middlewares/validation');
 const auth = require('./middlewares/auth');
 const error = require('./middlewares/error');
 
@@ -18,8 +19,8 @@ mongoose.connect('mongodb://localhost:27017/mestodb');
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.post('/signin', login);
-app.post('/signup', createUser);
+app.post('/signin', authValidate, login);
+app.post('/signup', registerValidate, createUser);
 app.use(errors());
 app.use(error);
 
