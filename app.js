@@ -1,28 +1,30 @@
 const express = require('express');
 const mongoose = require('mongoose');
-const cookieParser = require('cookie-parser');
-const helmet = require('helmet');
 const { errors } = require('celebrate');
-
-const routes = require('./routes');
+const userRouter = require('./routes/users');
+const cardRouter = require('./routes/cards');
+const { createUser, login, getUser } = require('./controllers/users');
+const auth = require('./middlewares/auth');
 const error = require('./middlewares/error');
 
 const { PORT = 3000 } = process.env;
 const app = express();
 
-app.use(helmet());
-app.use(cookieParser());
+mongoose.connect('mongodb://localhost:27017/mestodb');
+
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-mongoose.connect('mongodb://localhost:27017/mestodb', {
-  useUnifiedTopology: true,
-});
-
-app.use(routes); // all routes logic
+app.post('/signin', login);
+app.post('/signup', createUser);
 app.use(errors());
-app.use(error); // centralized error handler
+app.use(error);
+
+app.use(auth);
+app.use(userRouter);
+app.use(cardRouter);
+app.get('/users/me', getUser);
 
 app.listen(PORT, () => {
-  // eslint-disable-next-line no-console
-  console.log(`Server started on port ${PORT}`);
+  console.log(`App listening on port ${PORT}`);
 });
