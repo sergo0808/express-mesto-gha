@@ -1,9 +1,11 @@
 const express = require('express');
 const mongoose = require('mongoose');
+const { errors } = require('celebrate');
 const userRouter = require('./routes/users');
 const cardRouter = require('./routes/cards');
 const { createUser, login, getUser } = require('./controllers/users');
 const auth = require('./middlewares/auth');
+const error = require('./middlewares/error');
 
 const NOT_FOUND_CODE = 404;
 const SERVER_ERROR_CODE = 500;
@@ -23,6 +25,8 @@ app.use(auth);
 app.use(userRouter);
 app.use(cardRouter);
 app.get('/users/me', getUser);
+app.use(errors());
+app.use(error);
 
 app.use('*', (_, res) => {
   res.status(NOT_FOUND_CODE).send({ message: 'Страница не найдена' });

@@ -1,25 +1,24 @@
 const jwt = require('jsonwebtoken');
+const UnauthorizedError = require('../UnauthorizedError');
 
-module.exports = (req, res, next) => {
-  const { authorization } = req.headers;
-  console.log(req.headers);
-  if (!authorization || !authorization.startsWith('Bearer ')) {
-    return res
-      .status(401)
-      .send({ message: 'Необходима авторизация' });
-  }
+const { NODE_ENV, JWT_SECRET = 'dev-secret' } = process.env;
 
-  const token = authorization.replace('Bearer ', '');
+const auth = (req, _, next) => {
+  const token = req.cookies.jwt;
   let payload;
 
   try {
-    payload = jwt.verify(token, 'some-secret-key');
+    payload = jwt.verify(
+      token,
+      `${NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret'}`,
+    );
   } catch (err) {
-    return res
-      .status(401)
-      .send({ message: 'Необходима авторизация' });
+    throw new UnauthorizedError('Неверный электронный адрес или пароль');
   }
 
   req.user = payload;
-  return next();
+
+  next();
 };
+
+module.exports = auth;
