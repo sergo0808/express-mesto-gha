@@ -1,9 +1,9 @@
 const Card = require('../models/card');
-const NotFoundError = require('../NotFoundErrors');
-const ForbiddenError = require('../ForbiddenError');
-const BadRequestError = require('../BadRequestError');
+const NotFoundError = require('../errors/NotFoundError');
+const BadRequestError = require('../errors/BadRequestError');
+const ForbiddenError = require('../errors/ForbiddenError');
 
-const getCards = (req, res, next) => {
+const getCards = (_, res, next) => {
   Card.find({})
     .then((cards) => res.send(cards))
     .catch(next);
@@ -55,6 +55,7 @@ const deleteCard = (req, res, next) => {
       }
     });
 };
+
 const likeCard = (req, res, next) => {
   const { cardId } = req.params;
 
@@ -83,6 +84,7 @@ const likeCard = (req, res, next) => {
       }
     });
 };
+
 const dislikeCard = (req, res, next) => {
   const { cardId } = req.params;
 
@@ -111,5 +113,9 @@ const dislikeCard = (req, res, next) => {
 };
 
 module.exports = {
-  createCard, deleteCard, getCards, likeCard, dislikeCard,
+  getCards,
+  createCard,
+  deleteCard,
+  likeCard,
+  dislikeCard,
 };
