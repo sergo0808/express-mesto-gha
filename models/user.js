@@ -40,7 +40,7 @@ const userSchema = new mongoose.Schema({
   },
 });
 
-userSchema.statics.findUserByCredentials = function (email, password) {
+userSchema.statics.findUserByCredentials = function passwordHashHandler(email, password) {
   return this.findOne({ email }).select('+password')
     .then((user) => {
       if (!user) {
@@ -49,7 +49,7 @@ userSchema.statics.findUserByCredentials = function (email, password) {
 
       return bcrypt.compare(password, user.password)
         .then((matched) => {
-          if (matched) {
+          if (!matched) {
             throw new UnauthorizedError('Неверный электронный адрес или пароль');
           }
 
