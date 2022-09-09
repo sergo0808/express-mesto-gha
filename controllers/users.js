@@ -41,6 +41,27 @@ const getUser = (req, res, next) => {
     });
 };
 
+const getCurrentUser = (req, res, next) => {
+  const { _id } = req.user;
+
+  User.findById(_id)
+    .orFail(() => {
+      throw new NotFoundError(`Пользователь c id: ${_id} не найден`);
+    })
+    .then((user) => {
+      res.send({ data: user });
+    })
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        next(new BadRequestError('Передан некорректный id пользователя'));
+      } else if (err.name === 'NotFoundError') {
+        next(new NotFoundError(`Пользователь c id: ${_id} не найден`));
+      } else {
+        next(err);
+      }
+    });
+};
+
 const getUsers = (req, res, next) => {
   User.find({})
     .then((users) => res.send({ data: users }))
@@ -146,5 +167,5 @@ const updateAvatar = (req, res, next) => {
 };
 
 module.exports = {
-  createUser, getUser, getUsers, updateUser, updateAvatar, login,
+  createUser, getUser, getUsers, updateUser, updateAvatar, login, getCurrentUser,
 };
